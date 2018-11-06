@@ -159,7 +159,29 @@ class ApacheResolverTest extends TestCase
         $this->assertFalse($result->isValid());
     }
 
-        /**
+    public function testResolveNoValidPasswordWithoutPrependSign()
+    {
+        list($username, $password) = explode(':', base64_decode(base64_encode('admink:admin')));
+        $path = __DIR__ . '/TestAsset/htbasic-append.crypt';
+
+        $this->_apache->setFile($path);
+        $result = $this->_apache->resolve($username, null, $password);
+        $this->assertInstanceOf('Zend\Authentication\Result', $result);
+        $this->assertTrue($result->isValid());
+    }
+
+    public function testResolveNoValidPasswordWithPrependSign()
+    {
+        list($username, $password) = explode(':', base64_decode(base64_encode('admink:admin').'X'));
+        $path = __DIR__ . '/TestAsset/htbasic-append.crypt';
+
+        $this->_apache->setFile($path);
+        $result = $this->_apache->resolve($username, null, $password);
+        $this->assertInstanceOf('Zend\Authentication\Result', $result);
+        $this->assertFalse($result->isValid());
+    }
+
+    /**
      * Ensure that resolve() failed for not valid password
      *
      * @dataProvider providePasswordFiles
